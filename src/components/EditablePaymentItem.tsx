@@ -99,8 +99,7 @@ export default function EditablePaymentItem({
   const [editedPayment, setEditedPayment] = useState<Payment>(payment);
   // 입력 필드 유효성 검사 에러 상태 관리
   const [errors, setErrors] = useState<{ amount?: string; item?: string; target?: string }>({});
-  const [splitMethod, setSplitMethod] = useState<'equal' | 'custom'>('equal');
-
+  const splitMethod = 'custom';
   /**
    * isEditing 상태가 변경될 때 editedPayment를 초기화/업데이트하고 에러 상태를 초기화합니다.
    */
@@ -246,9 +245,7 @@ export default function EditablePaymentItem({
                 <Label>정산 대상자</Label>
                 <div className={cn(
                   "mt-2 p-3 border rounded-md max-h-32 overflow-y-auto",
-                  splitMethod === 'equal'
-                  ? "grid grid-cols-2 md:grid-cols-3 gap-2"
-                  : "space-y-2",
+                  "space-y-2",
                   errors.target && "border-destructive"
                 )}>
                 {participants.map((p, index) => {
@@ -313,23 +310,6 @@ export default function EditablePaymentItem({
                  {errors.target && <p className="text-xs text-destructive mt-1">{errors.target}</p>}
               </div>
               <div></div>
-              {/* 결제 방식 */}
-              <div>
-                <Label htmlFor={`splitMethod-${payment.id}`}>확인 방식</Label>
-                <Select
-                  value={splitMethod}
-                  onValueChange={(value) => setSplitMethod(value as 'equal' | 'custom')}
-                  disabled={isCompleted}
-  >
-                  <SelectTrigger id={`splitMethod-${payment.id}`}>
-                  <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                  <SelectItem value="equal">인원 확인</SelectItem>
-                  <SelectItem value="custom">금액 확인</SelectItem>
-                  </SelectContent>
-                  </Select>
-              </div>
             </div>
 
              {/* 수정/취소/삭제 버튼 */}
