@@ -207,7 +207,7 @@ export default function SettlementDetail({ payments, participants, onPaymentsCha
         <CardDescription>
             {isCompleted
                 ? "이 정산은 완료되어 수정할 수 없습니다."
-                : "각 항목을 클릭하여 수정하거나 삭제할 수 있습니다."}
+                : "각 항목을 클릭하여 수정 / 삭제를 할 수 있습니다."}
         </CardDescription>
       </CardHeader>
       <CardContent>

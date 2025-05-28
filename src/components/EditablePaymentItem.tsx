@@ -181,10 +181,18 @@ export default function EditablePaymentItem({
 
   // --- 렌더링 ---
   return (
-    <Card className={cn(
-      "transition-all duration-300 ease-in-out",
-      isEditing && !isCompleted ? "bg-secondary/30 shadow-md border-primary" : "hover:shadow-sm" // 수정 모드이고 완료되지 않았을 때 스타일 변경
-    )}>
+    <Card
+      className={cn(
+        "transition-all duration-300 ease-in-out",
+        isEditing && !isCompleted ? "bg-secondary/30 shadow-md border-primary" : "hover:shadow-sm",
+        !isCompleted && !isEditing && "cursor-pointer" // 포인터 커서 조건부로 추가
+      )}
+      onClick={() => {
+        if (!isCompleted && !isEditing) {
+          onEditClick(payment.id);
+        }
+      }}
+    >
       <CardContent className="p-4">
         {isEditing && !isCompleted ? ( // 수정 모드이고 완료되지 않았을 때만 수정 UI 표시
           // --- 수정 모드 UI ---
@@ -252,7 +260,7 @@ export default function EditablePaymentItem({
                   const isTarget = editedPayment.target.includes(p)
 
                     return (
-                     <div key={p} className="flex items-center justify-between space-x-2">
+                     <div key={p} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                        <div className="flex items-center space-x-2">
                          <Checkbox
                            id={`target-${payment.id}-${p}`}
@@ -349,7 +357,6 @@ export default function EditablePaymentItem({
           <div className="flex items-center justify-between gap-4">
              {/* 왼쪽 영역: 핸들, 아바타, 항목명, 결제자 정보, 이미지 아이콘 */}
              <div className="flex items-center gap-3 flex-grow min-w-0">
-               {!isCompleted && <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0 cursor-grab" />} {/* 완료 시 드래그 핸들 숨김 */}
                <Avatar className="h-9 w-9 text-sm flex-shrink-0">
                   <AvatarFallback style={stringToColor(getNickname(payment.payer))}>{getInitials(getNickname(payment.payer))}</AvatarFallback>
                </Avatar>
@@ -360,29 +367,11 @@ export default function EditablePaymentItem({
                  </p>
                </div>
              </div>
-
-             {/* 오른쪽 영역: 금액, 수정 버튼 */}
-             <div className="flex items-center gap-2 flex-shrink-0">
-                 <p className="font-bold text-primary">{payment.amount.toLocaleString()}원</p>
-                 {/* 수정 버튼 (명시적), 완료되지 않았을 때만 표시 및 활성화 */}
-                 {!isCompleted && (
-                   <Button
-                     variant="ghost"
-                     size="icon"
-                     className="h-8 w-8"
-                     onClick={(e) => { e.stopPropagation(); onEditClick(payment.id); }}
-                     title="항목 수정"
-                   >
-                     <Edit className="h-4 w-4" />
-                   </Button>
-                 )}
-                 {/* 완료 시 잠금 아이콘 표시 */}
-                 {isCompleted && (
-                  <span title="완료된 정산 항목">
-                  <Lock className="h-4 w-4 text-muted-foreground" />
-                </span>
-                )}
-             </div>
+             <div className="text-left sm:text-right">
+              <p className="font-bold text-primary">
+              {payment.amount.toLocaleString()}원
+              </p>
+            </div>
           </div>
         )}
       </CardContent>
