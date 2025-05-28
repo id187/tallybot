@@ -354,23 +354,22 @@ export default function EditablePaymentItem({
           </div>
         ) : (
           // --- 보기 모드 UI ---
-          <div className="flex items-center justify-between gap-4">
-             {/* 왼쪽 영역: 핸들, 아바타, 항목명, 결제자 정보, 이미지 아이콘 */}
-             <div className="flex items-center gap-3 flex-grow min-w-0">
-               <Avatar className="h-9 w-9 text-sm flex-shrink-0">
-                  <AvatarFallback style={stringToColor(getNickname(payment.payer))}>{getInitials(getNickname(payment.payer))}</AvatarFallback>
-               </Avatar>
-               <div className="flex-grow min-w-0">
-                 <p className="font-semibold truncate" title={payment.item}>{payment.item}</p>
-                 <p className="text-sm text-muted-foreground">
-                    {getNickname(payment.payer)} 결제 · {payment.target.length}명 정산
-                 </p>
-               </div>
-             </div>
-             <div className="text-left sm:text-right">
-              <p className="font-bold text-primary">
-              {payment.amount.toLocaleString()}원
+          <div className="flex items-start gap-3">
+            <Avatar className="h-10 w-10 flex-shrink-0">
+              <AvatarFallback style={stringToColor(getNickname(payment.payer))}>
+               {getInitials(getNickname(payment.payer))}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* 내용 */}
+            <div className="flex flex-col">
+              <p className="font-semibold text-lg leading-tight truncate">{payment.item}</p>
+              <p className="text-sm text-muted-foreground leading-snug">
+             {getNickname(payment.payer)} 결제 · {payment.target.length}명 정산
               </p>
+              <p className="text-sm text-blue-600 font-medium mt-1 whitespace-nowrap">
+                {payment.amount.toLocaleString()}원
+             </p>
             </div>
           </div>
         )}
