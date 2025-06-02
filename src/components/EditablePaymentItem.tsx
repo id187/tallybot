@@ -183,7 +183,7 @@ export default function EditablePaymentItem({
   return (
     <Card
       className={cn(
-        "transition-all duration-300 ease-in-out",
+        "transition-all duration-300 ease-in-out max-w-full",
         isEditing && !isCompleted ? "bg-secondary/30 shadow-md border-primary" : "hover:shadow-sm",
         !isCompleted && !isEditing && "cursor-pointer" // 포인터 커서 조건부로 추가
       )}
@@ -193,12 +193,12 @@ export default function EditablePaymentItem({
         }
       }}
     >
-      <CardContent className="p-4 w-full overflow-x-auto">
+      <CardContent className="p-4 w-full overflow-x-hidden max-w-full">
         {isEditing && !isCompleted ? ( // 수정 모드이고 완료되지 않았을 때만 수정 UI 표시
           // --- 수정 모드 UI ---
           <div className="space-y-4">
             {/* 항목명, 금액, 이미지 URL 입력 필드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
               {/* 항목명 */}
               <div className="md:col-span-1">
                 <Label htmlFor={`item-${payment.id}`}>항목명</Label>
@@ -207,7 +207,7 @@ export default function EditablePaymentItem({
                   value={editedPayment.item}
                   onChange={(e) => handleChange('item', e.target.value.slice(0, 30))}
                   maxLength={30}
-                  className={cn(errors.item && "border-destructive")}
+                  className={cn("w-full", errors.item && "border-destructive")}
                   disabled={isCompleted}
                 />
                 {errors.item && <p className="text-xs text-destructive mt-1">{errors.item}</p>}
@@ -222,7 +222,7 @@ export default function EditablePaymentItem({
                   value={editedPayment.amount}
                   onChange={(e) => handleChange('amount', parseInt(e.target.value) || 0)}
                   readOnly={splitMethod === 'custom'}
-                  className={cn(errors.amount && "border-destructive")}
+                  className={cn("w-full", errors.item && "border-destructive")}
                   disabled={isCompleted}
                   />
                   {errors.amount && <p className="text-xs text-destructive mt-1">{errors.amount}</p>}
@@ -239,7 +239,7 @@ export default function EditablePaymentItem({
                   onValueChange={(value) => handleChange('payer', value)}
                   disabled={isCompleted}
                 >
-                  <SelectTrigger id={`payer-${payment.id}`}>
+                  <SelectTrigger id={`payer-${payment.id}`} className="w-full">  
                     <SelectValue placeholder="결제자 선택" />
                   </SelectTrigger>
                   <SelectContent>
