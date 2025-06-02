@@ -183,7 +183,8 @@ export default function EditablePaymentItem({
   return (
     <Card
       className={cn(
-        "transition-all duration-300 ease-in-out w-full max-w-full", // ✅ 여기에 w-full 반드시 필요
+        "w-full min-w-0",
+        "transition-all duration-300 ease-in-out",
         isEditing && !isCompleted ? "bg-secondary/30 shadow-md border-primary" : "hover:shadow-sm",
         !isCompleted && !isEditing && "cursor-pointer"
       )}
@@ -193,12 +194,12 @@ export default function EditablePaymentItem({
         }
       }}
     >
-      <CardContent className="p-4 w-full overflow-x-hidden max-w-full">
+      <CardContent className="p-4 w-full max-w-full overflow-x-hidden min-w-0">
         {isEditing && !isCompleted ? ( // 수정 모드이고 완료되지 않았을 때만 수정 UI 표시
           // --- 수정 모드 UI ---
           <div className="space-y-4">
             {/* 항목명, 금액, 이미지 URL 입력 필드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0"> 
               {/* 항목명 */}
               <div className="md:col-span-1 min-w-0"> 
                 <Label htmlFor={`item-${payment.id}`}>항목명</Label>
@@ -230,7 +231,7 @@ export default function EditablePaymentItem({
             </div>
 
             {/* 결제자, 정산 대상자 선택 필드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0"> 
               {/* 결제자 */}
               <div>
                 <Label htmlFor={`payer-${payment.id}`}>결제자</Label>
