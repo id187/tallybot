@@ -212,9 +212,9 @@ export default function SettlementDetail({ payments, participants, onPaymentsCha
                 : "각 항목을 클릭하여 수정 / 삭제를 할 수 있습니다."}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="w-full max-w-full overflow-x-hidden">
         {/* 결제 항목 리스트 (스크롤 가능) */}
-        <ScrollArea className="h-[400px] pr-4"> {/* 높이 고정 및 스크롤 적용 */}
+        <ScrollArea className="h-[400px] pr-4 w-full max-w-full overflow-x-hidden"> {/* 높이 고정 및 스크롤 적용 */}
           {payments.length > 0 ? ( // 항목이 있을 경우
             <ul className="space-y-4"> {/* 항목 간 간격 */}
               {payments.map((payment) => (
