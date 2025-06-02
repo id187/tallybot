@@ -129,8 +129,8 @@ export default function SettlementDetail({
             : '각 항목을 클릭하여 수정 / 삭제를 할 수 있습니다.'}
         </CardDescription>
       </CardHeader>
-      <CardContent className="w-full max-w-full overflow-x-hidden min-w-0">
-        <ScrollArea className="h-[400px] pr-4 w-full max-w-full overflow-x-hidden min-w-0">
+      <CardContent className="w-full max-w-full overflow-x-auto min-w-0">
+        <ScrollArea className="h-[400px] pr-4 w-full max-w-full overflow-x-auto min-w-0">
           {payments.length > 0 ? (
             <ul className="space-y-4 w-full">
               {payments.map(payment => (
