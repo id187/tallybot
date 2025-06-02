@@ -216,9 +216,9 @@ export default function SettlementDetail({ payments, participants, onPaymentsCha
         {/* 결제 항목 리스트 (스크롤 가능) */}
         <ScrollArea className="h-[400px] pr-4 w-full max-w-full overflow-x-hidden"> {/* 높이 고정 및 스크롤 적용 */}
           {payments.length > 0 ? ( // 항목이 있을 경우
-            <ul className="space-y-4"> {/* 항목 간 간격 */}
+            <ul className="space-y-4 w-full">
               {payments.map((payment) => (
-                <li key={payment.id}> {/* 각 항목을 EditablePaymentItem으로 렌더링 */}
+                <li key={payment.id} className="w-full"> 
                   <EditablePaymentItem
                     payment={payment}
                     participants={participants}

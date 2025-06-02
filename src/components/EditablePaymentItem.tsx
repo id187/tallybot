@@ -183,9 +183,9 @@ export default function EditablePaymentItem({
   return (
     <Card
       className={cn(
-        "transition-all duration-300 ease-in-out max-w-full",
+        "transition-all duration-300 ease-in-out w-full max-w-full", // ✅ 여기에 w-full 반드시 필요
         isEditing && !isCompleted ? "bg-secondary/30 shadow-md border-primary" : "hover:shadow-sm",
-        !isCompleted && !isEditing && "cursor-pointer" // 포인터 커서 조건부로 추가
+        !isCompleted && !isEditing && "cursor-pointer"
       )}
       onClick={() => {
         if (!isCompleted && !isEditing) {
@@ -200,7 +200,7 @@ export default function EditablePaymentItem({
             {/* 항목명, 금액, 이미지 URL 입력 필드 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
               {/* 항목명 */}
-              <div className="md:col-span-1">
+              <div className="md:col-span-1 min-w-0"> 
                 <Label htmlFor={`item-${payment.id}`}>항목명</Label>
                 <Input
                   id={`item-${payment.id}`}
@@ -213,7 +213,7 @@ export default function EditablePaymentItem({
                 {errors.item && <p className="text-xs text-destructive mt-1">{errors.item}</p>}
               </div>
               {/* 금액 */}
-               <div className="md:col-span-1">
+              <div className="md:col-span-1 min-w-0"> 
                  <Label htmlFor={`amount-${payment.id}`}>금액 (원)</Label>
                  <Input
                   id={`amount-${payment.id}`}
@@ -261,7 +261,7 @@ export default function EditablePaymentItem({
                   const isTarget = editedPayment.target.includes(p)
 
                     return (
-                     <div key={p} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div key={p} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 min-w-0">
                        <div className="flex items-center space-x-2">
                          <Checkbox
                            id={`target-${payment.id}-${p}`}
