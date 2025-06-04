@@ -58,30 +58,52 @@ export default function SettlementDetail({
   const handleUpdatePayment = async (updatedPayment: Payment) => {
     if (isCompleted) return;
     try {
-      const ratioArray = updatedPayment.ratio ?? updatedPayment.target.map(() => 1);
-      const constants = JSON.parse(JSON.stringify(Object.fromEntries(
-        updatedPayment.target.map((t, i) => [String(t), updatedPayment.constant?.[i] ?? 0])
-      )));
-      const ratios = JSON.parse(JSON.stringify(Object.fromEntries(
-        updatedPayment.target.map((t, i) => [String(t), ratioArray[i]])
-      )));
-
-      await updateSettlementField({
+      const original = payments.find(p => p.id === updatedPayment.id);
+      if (!original) return;
+  
+      const hasAmountChanged = original.amount !== updatedPayment.amount;
+      const hasItemChanged = original.item !== updatedPayment.item;
+      const hasPayerChanged = original.payer !== updatedPayment.payer;
+      const hasParticipantsChanged =
+        JSON.stringify(original.target) !== JSON.stringify(updatedPayment.target);
+  
+      const newValue: any = {};
+      if (hasAmountChanged) newValue.amount = updatedPayment.amount;
+      if (hasItemChanged) newValue.item = updatedPayment.item;
+      if (hasPayerChanged) newValue.payer = Number(updatedPayment.payer);
+      if (hasParticipantsChanged) {
+        newValue.participants = updatedPayment.target.map(Number);
+      }
+  
+      let constants = null;
+      let ratios = null;
+      let sum = null;
+  
+      if (hasParticipantsChanged || hasAmountChanged) {
+        constants = Object.fromEntries(
+          updatedPayment.target.map((t, idx) => [String(t), updatedPayment.constant?.[idx] ?? 0])
+        );
+  
+        ratios = Object.fromEntries(
+          updatedPayment.target.map((t) => [String(t), 1])
+        );
+  
+        sum = updatedPayment.target.length;
+      }
+  
+      const payload = {
         calculateId: Number(groupId),
         settlementId: Number(updatedPayment.id),
         field: 'update',
-        newValue: {
-          payer: Number(updatedPayment.payer),
-          amount: updatedPayment.amount,
-          item: updatedPayment.item,
-          place: '없음',
-          participants: updatedPayment.target.map(Number),
-        },
-        constants,
+        newValue,         // 👈 amount, item, payer, participants만 포함
+        constants,        // 👈 constants는 루트에서 보냄
         ratios,
-        sum: updatedPayment.amount,
-      });
-
+        sum,
+      };
+  
+      console.log('[전송 payload]', JSON.stringify(payload, null, 2));
+      await updateSettlementField(payload);
+  
       const updatedPayments = payments.map(p =>
         p.id === updatedPayment.id ? updatedPayment : p
       );

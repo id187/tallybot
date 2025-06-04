@@ -124,7 +124,9 @@ export async function getSettlement(calculateId: string): Promise<Settlement> {
     payer: s.payerId.toString(),
     target,
     ratio: participants.map((id: string) => target.includes(id) ? s.ratios?.[id] ?? 0 : 0),
-    constant: participants.map((id: string) => target.includes(id) ? s.constants?.[id] ?? 0 : 0),
+    constant: target.map((id: string) =>
+      s.constants?.hasOwnProperty(id) ? s.constants[id] : undefined
+    ),
     amount: s.amount,
     item: s.item,
   };
@@ -166,7 +168,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
  */
 export async function updateSettlement(id: string, settlement: Settlement): Promise<Settlement> {
   const res = await fetch(`http://tally-bot-web-backend-alb-243058276.ap-northeast-2.elb.amazonaws.com/api/settlements/${id}`, {
-    method: 'PUT',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settlement),
   });
@@ -182,7 +184,7 @@ export async function updateSettlement(id: string, settlement: Settlement): Prom
  */
 export async function updateSettlementField(payload: any): Promise<Settlement> {
   const res = await fetch('/api/proxy/settlement-update', {
-    method: 'PUT',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });

@@ -130,22 +130,36 @@ export default function EditablePaymentItem({
    * @param checked - 체크 여부
    */
   const handleTargetChange = (participant: string, checked: boolean) => {
-    const newTargets = checked
-      ? [...editedPayment.target, participant]
-      : editedPayment.target.filter(p => p !== participant)
+    const prevTargets = editedPayment.target;
+    const prevConstants = editedPayment.constant || [];
   
-    const newAmount = (editedPayment.constant || []).reduce((sum, val, i) => {
-      if (newTargets.includes(participants[i]) && typeof val === 'number') {
-        return sum + val
+    let newTargets: string[] = [];
+    let newConstants: number[] = [];
+  
+    if (checked) {
+      // 새로 추가
+      newTargets = [...prevTargets, participant];
+      newConstants = [...prevConstants, 0]; // 기본값 0
+    } else {
+      // 체크 해제 → 제거
+      const removeIndex = prevTargets.indexOf(participant);
+      if (removeIndex !== -1) {
+        newTargets = prevTargets.filter((_, i) => i !== removeIndex);
+        newConstants = prevConstants.filter((_, i) => i !== removeIndex);
+      } else {
+        newTargets = [...prevTargets];
+        newConstants = [...prevConstants];
       }
-      return sum
-    }, 0)
+    }
+  
+    const newAmount = newConstants.reduce((sum, val) => sum + val, 0);
   
     setEditedPayment(prev => ({
       ...prev,
       target: newTargets,
-      amount: splitMethod === 'custom' ? newAmount : prev.amount
-    }))
+      constant: newConstants,
+      amount: newAmount,
+    }));
   };
 
    /**
@@ -173,9 +187,16 @@ export default function EditablePaymentItem({
    * 유효성 검사 후 부모의 onUpdate 함수를 호출합니다.
    */
   const handleSave = () => {
-    if (isCompleted) return; // 완료된 정산은 저장 불가
-    if (validate()) { // 유효성 검사 통과 시
-        onUpdate(editedPayment); // 변경된 데이터를 부모 컴포넌트로 전달
+    if (isCompleted) return;
+    if (validate()) {
+      const updatedConstant = editedPayment.target.map((_, i) => editedPayment.constant?.[i] ?? 0);
+  
+      const finalEdited = {
+        ...editedPayment,
+        constant: updatedConstant,
+      };
+  
+      onUpdate(finalEdited);
     }
   };
 
@@ -259,66 +280,62 @@ export default function EditablePaymentItem({
                   errors.target && "border-destructive"
                 )}>
                 {participants.map((p, index) => {
-                  const isTarget = editedPayment.target.includes(p)
+  const isTarget = editedPayment.target.includes(p);
+  const targetIndex = editedPayment.target.indexOf(p);
+  const value = editedPayment.constant?.[targetIndex] ?? '';
 
-                    return (
-                      <div key={p} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 min-w-0">
-                       <div className="flex items-center space-x-2">
-                         <Checkbox
-                           id={`target-${payment.id}-${p}`}
-                           checked={isTarget}
-                           onCheckedChange={(checked) => handleTargetChange(p, !!checked)}
-                           disabled={isCompleted}
-                         />
-                         <label
-                           htmlFor={`target-${payment.id}-${p}`}
-                           className={cn(
-                             "text-lg font-medium leading-none",
-                             !isTarget && "text-muted-foreground",
-                             isCompleted && "cursor-not-allowed opacity-70"
-                           )}
-                         >
-                           {getNickname(p)}
-                         </label>
-                       </div>
+  return (
+    <div key={p} className="flex justify-between items-center">
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id={`target-${payment.id}-${p}`}
+          checked={isTarget}
+          onCheckedChange={(checked) => handleTargetChange(p, !!checked)}
+          disabled={isCompleted}
+        />
+        <label htmlFor={`target-${payment.id}-${p}`}>
+          {getNickname(p)}
+        </label>
+      </div>
 
-                       {splitMethod === 'custom' && (
-                         <Input
-                         type="number"
-                         step={1000}
-                         disabled={!isTarget || isCompleted}
-                         value={editedPayment.constant?.[index] ?? ''}
-                         onChange={(e) => {
-                           const rawValue = e.target.value;
-                           if (rawValue.length > 8) return;
-                       
-                           const value = parseInt(rawValue);
-                           if (isNaN(value) || value < 0) return;
-                       
-                           const newConst = [...(editedPayment.constant || [])];
-                           newConst[index] = value;
-                       
-                           const total = newConst.reduce(
-                             (sum, val, i) =>
-                               editedPayment.target.includes(participants[i]) && typeof val === 'number'
-                                 ? sum + val
-                                 : sum,
-                             0
-                           );
-                       
-                           setEditedPayment(prev => ({
-                             ...prev,
-                             constant: newConst,
-                             amount: total
-                           }));
-                         }}
-                         className="w-28 h-8 text-sm"
-                         placeholder="금액"
-                       />
-                       )}
-                     </div>
-                   )
-                 })}
+      {/* constant 입력은 대상자일 때만 보여줌 */}
+      {isTarget ? (
+  <Input
+    type="number"
+    step={1000}
+    value={value}
+    onChange={(e) => {
+      const raw = e.target.value;
+      if (raw.length > 8) return;
+      const parsed = parseInt(raw);
+      if (isNaN(parsed) || parsed < 0) return;
+
+      const newConstants = [...(editedPayment.constant || [])];
+      newConstants[targetIndex] = parsed;
+
+      const total = newConstants.reduce((sum, v) => sum + v, 0);
+
+      setEditedPayment(prev => ({
+        ...prev,
+        constant: newConstants,
+        amount: total,
+      }));
+    }}
+    className="w-28 h-8 text-sm"
+    disabled={isCompleted}
+  />
+) : (
+  <Input
+    type="number"
+    value={0}
+    className="w-28 h-8 text-sm text-muted-foreground bg-muted cursor-not-allowed"
+    disabled
+  />
+)}
+    </div>
+  );
+})}
+
                 </div>
                  {errors.target && <p className="text-xs text-destructive mt-1">{errors.target}</p>}
               </div>
