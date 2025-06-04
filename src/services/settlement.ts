@@ -112,19 +112,23 @@ export async function getSettlement(calculateId: string): Promise<Settlement> {
   const data = await res.json();
 
   const participants = data.settlements
-    .flatMap((s: any) => s.participantIds)
-    .filter((v: any, i: number, arr: any[]) => arr.indexOf(v) === i)
-    .map((id: number) => id.toString());
+  .flatMap((s: any) => s.participantIds)
+  .filter((v: any, i: number, arr: any[]) => arr.indexOf(v) === i)
+  .map((id: number) => id.toString());
 
-  const payments = data.settlements.map((s: any) => ({
+  const payments = data.settlements.map((s: any) => {
+  const target = s.participantIds.map((id: number) => id.toString());
+
+  return {
     id: s.settlementId,
     payer: s.payerId.toString(),
-    target: s.participantIds.map((id: number) => id.toString()),
-    ratio: Object.values(s.ratios),
-    constant: Object.values(s.constants),
+    target,
+    ratio: participants.map((id: string) => target.includes(id) ? s.ratios?.[id] ?? 0 : 0),
+    constant: participants.map((id: string) => target.includes(id) ? s.constants?.[id] ?? 0 : 0),
     amount: s.amount,
     item: s.item,
-  }));
+  };
+});
 
   const transferRes = await fetch(`/api/proxy/transfer-result?id=${calculateId}`);
   if (!transferRes.ok) throw new Error('송금 결과 불러오기 실패');
